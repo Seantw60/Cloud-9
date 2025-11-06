@@ -136,6 +136,7 @@ function App() {
         </div>
         <Statistics data={weather.list[0]} />
       </div>
+
       <InfoCards data={weather.list[0]} city={weather.city} />
 
       {showAlerts && (
@@ -145,6 +146,6 @@ function App() {
         />
       )}
     </div>
+    
   );
 }
-

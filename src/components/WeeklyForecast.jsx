@@ -1,7 +1,4 @@
-export default function Framework() {
-
-
-function WeeklyForecast({ forecast }) {
+export default function WeeklyForecast({ forecast }) {
   const dailyData = forecast.filter((item, index) => index % 8 === 0).slice(0, 7);
 
   const getWeatherEmoji = (iconCode) => {
@@ -39,5 +36,3 @@ function WeeklyForecast({ forecast }) {
     </div>
   );
 }
-
-export default WeeklyForecast;
