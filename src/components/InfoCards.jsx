@@ -1,5 +1,5 @@
 import React from 'react';
-
+export default InfoCards 
 function InfoCards({ data, city }) {
   const windDirection = data.wind.deg;
   const airQuality = 'Good'; // You'd need a separate API for real AQI
@@ -25,4 +25,3 @@ function InfoCards({ data, city }) {
   );
 }
 
-export default InfoCards;
