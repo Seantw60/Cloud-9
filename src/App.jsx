@@ -15,6 +15,7 @@ export default function App() {
   const [alerts, setAlerts] = useState([]);
   const [showAlerts, setShowAlerts] = useState(false);
   const [error, setError] = useState(null);
+  const [currentPage, setCurrentPage] = useState('home');
 
   // 🌎 Use geolocation hook (auto-detects user position)
   const { location, error: geoError, loading: geoLoading } = useGeolocation();
@@ -68,9 +69,10 @@ export default function App() {
       };
 
       setWeather(processedForecast);
-      if (stateAlerts?.features?.length) {
-        setAlerts(stateAlerts.features);
-      }
+      
+      // Store official NOAA alerts (these are already significant weather alerts)
+      const officialAlerts = stateAlerts?.features || [];
+      setAlerts(officialAlerts);
 
       setLoading(false);
     } catch (err) {
@@ -80,88 +82,146 @@ export default function App() {
     }
   };
 
-  // ⚠️ Generate custom alerts based on conditions
+  // ⚠️ Generate alerts ONLY for SEVERE weather events (like Amber Alerts)
+  // Only triggers for: Snow, Blizzards, Thunderstorms, Severe Storms
+  // Rain alerts are excluded - only severe conditions trigger the popup
   const generateAlerts = (data) => {
     const newAlerts = [];
     const current = data.list[0];
-    const nextHour = data.list[1];
+    const nextPeriod = data.list[1];
     const tomorrow = data.list[8];
 
-    // Temperature alerts
-    if (current.main.temp > 85) {
+    // Helper function to check for SEVERE weather conditions only
+    const hasSevereWeather = (weatherData) => {
+      if (!weatherData?.weather?.[0]) return false;
+      
+      const main = weatherData.weather[0].main?.toLowerCase() || '';
+      const description = weatherData.weather[0].description?.toLowerCase() || '';
+      const combined = `${main} ${description}`;
+      
+      // Only check for SEVERE weather conditions (not regular rain)
+      const severeKeywords = [
+        'snow', 'sleet', 'blizzard', 'winter storm',
+        'thunderstorm', 'severe storm', 'lightning',
+        'hail', 'freezing rain', 'ice storm',
+        'tornado', 'hurricane', 'typhoon'
+      ];
+      
+      return severeKeywords.some(keyword => combined.includes(keyword));
+    };
+
+    // Check for current SEVERE weather (Snow, Blizzards, Thunderstorms only)
+    if (hasSevereWeather(current)) {
+      const weatherType = current.weather[0].main?.toLowerCase() || current.weather[0].description?.toLowerCase() || '';
+      let icon = '⚠️';
+      let severity = 'danger';
+      let title = 'Severe Weather Alert';
+      
+      if (weatherType.includes('snow') || weatherType.includes('blizzard') || weatherType.includes('winter storm')) {
+        icon = '❄️';
+        title = 'Snow/Blizzard Alert';
+      } else if (weatherType.includes('thunderstorm') || weatherType.includes('severe storm') || weatherType.includes('lightning')) {
+        icon = '⛈️';
+        title = 'Thunderstorm Alert';
+      } else if (weatherType.includes('hail') || weatherType.includes('freezing rain') || weatherType.includes('ice storm')) {
+        icon = '🧊';
+        title = 'Severe Weather Alert';
+      }
+      
       newAlerts.push({
-        title: 'High Temperature Alert',
-        message: `It's ${Math.round(current.main.temp)}°F. Stay hydrated and avoid prolonged sun exposure.`,
+        title: title,
+        message: `${current.weather[0].description || 'Severe weather conditions'} currently affecting your area. Take immediate precautions and stay safe.`,
         timeframe: 'Current',
-        severity: 'warning',
-        icon: '🌡️',
+        severity: severity,
+        icon: icon,
       });
     }
 
-    if (current.main.temp < 32) {
+    // Check for upcoming SEVERE weather in next period
+    if (nextPeriod && hasSevereWeather(nextPeriod)) {
+      const weatherType = nextPeriod.weather[0].main?.toLowerCase() || nextPeriod.weather[0].description?.toLowerCase() || '';
+      let icon = '⚠️';
+      let severity = 'danger';
+      let title = 'Severe Weather Expected';
+      
+      if (weatherType.includes('snow') || weatherType.includes('blizzard') || weatherType.includes('winter storm')) {
+        icon = '❄️';
+        title = 'Snow/Blizzard Expected';
+      } else if (weatherType.includes('thunderstorm') || weatherType.includes('severe storm')) {
+        icon = '⛈️';
+        title = 'Thunderstorm Expected';
+      } else if (weatherType.includes('hail') || weatherType.includes('freezing rain')) {
+        icon = '🧊';
+        title = 'Severe Weather Expected';
+      }
+      
       newAlerts.push({
-        title: 'Freezing Temperature',
-        message: `Temperature is ${Math.round(current.main.temp)}°F. Bundle up and watch for ice!`,
-        timeframe: 'Current',
-        severity: 'danger',
-        icon: '🥶',
+        title: title,
+        message: `${nextPeriod.weather[0].description || 'Severe weather'} expected soon. Prepare immediately and take necessary precautions.`,
+        timeframe: 'Upcoming',
+        severity: severity,
+        icon: icon,
       });
     }
 
-    // Rain alerts
-    if (nextHour.weather[0].main === 'Rain' || current.weather[0].main === 'Rain') {
+    // Check for major SEVERE weather change (severe weather starting)
+    if (tomorrow && !hasSevereWeather(current) && hasSevereWeather(tomorrow)) {
+      const weatherType = tomorrow.weather[0].main?.toLowerCase() || tomorrow.weather[0].description?.toLowerCase() || '';
+      let icon = '⚠️';
+      let severity = 'danger';
+      let title = 'Severe Weather Change';
+      
+      if (weatherType.includes('snow') || weatherType.includes('blizzard')) {
+        icon = '❄️';
+        title = 'Snow/Blizzard Expected';
+      } else if (weatherType.includes('thunderstorm')) {
+        icon = '⛈️';
+        title = 'Thunderstorm Expected';
+      } else if (weatherType.includes('hail') || weatherType.includes('freezing rain')) {
+        icon = '🧊';
+        title = 'Severe Weather Expected';
+      }
+      
       newAlerts.push({
-        title: 'Rain Expected',
-        message: 'Bring an umbrella! Rain is expected within the next hour.',
-        timeframe: 'Next Hour',
-        severity: 'info',
-        icon: '☔',
-      });
-    }
-
-    // Wind alerts
-    if (current.wind.speed > 20) {
-      newAlerts.push({
-        title: 'High Wind Warning',
-        message: `Wind speeds reaching ${Math.round(current.wind.speed)} mph. Secure loose objects.`,
-        timeframe: 'Current',
-        severity: 'warning',
-        icon: '💨',
-      });
-    }
-
-    // Tomorrow’s weather
-    if (tomorrow.weather[0].main === 'Rain') {
-      newAlerts.push({
-        title: 'Rain Tomorrow',
-        message: 'Plan ahead! Rain is expected tomorrow.',
+        title: title,
+        message: `Severe weather change expected: ${tomorrow.weather[0].description || 'severe conditions'}. Plan ahead and prepare.`,
         timeframe: 'Tomorrow',
-        severity: 'info',
-        icon: '🌧️',
+        severity: severity,
+        icon: icon,
       });
     }
 
-    if (Math.abs(current.main.temp - tomorrow.main.temp) > 15) {
-      newAlerts.push({
-        title: 'Temperature Change',
-        message: `Expect a ${Math.round(Math.abs(current.main.temp - tomorrow.main.temp))}°F temperature change tomorrow.`,
-        timeframe: 'Tomorrow',
-        severity: 'info',
-        icon: '📊',
-      });
-    }
-
-    setAlerts(newAlerts);
+    // Only set alerts if there are SEVERE weather events
+    // Combine with existing official NOAA alerts
+    setAlerts(prevAlerts => {
+      const existingAlerts = prevAlerts || [];
+      // Only add custom alerts if they're SEVERE weather events
+      const combined = [...existingAlerts, ...newAlerts];
+      return combined;
+    });
+    
+    // Automatically show popup for severe weather (no badge click needed)
     if (newAlerts.length > 0) {
       setShowAlerts(true);
     }
+  };
+
+  // Navigation handler
+  const handleNavigate = (page) => {
+    setCurrentPage(page);
+    // For now, just update the state. You can add routing logic here later
+    console.log(`Navigating to: ${page}`);
   };
 
   // 🌀 Handle loading and error states
   if (loading || geoLoading) {
     return (
       <div className="app loading">
-        <Header city="Loading..." />
+        <Header 
+          city="Loading..." 
+          currentPage={currentPage}
+          onNavigate={handleNavigate}
+        />
         <div className="loading-indicator">
           {geoLoading ? 'Detecting your location...' : 'Loading weather data...'}
         </div>
@@ -172,7 +232,11 @@ export default function App() {
   if (error || !weather) {
     return (
       <div className="app error">
-        <Header city="Error" />
+        <Header 
+          city="Error" 
+          currentPage={currentPage}
+          onNavigate={handleNavigate}
+        />
         <div className="error-message">{error || 'Unable to load weather data'}</div>
       </div>
     );
@@ -181,14 +245,13 @@ export default function App() {
   // 🌤️ Main UI
   return (
     <div className="app">
-      <Header city={`${weather.city.name}, ${weather.city.state}`} />
+      <Header 
+        city={`${weather.city.name}, ${weather.city.state}`}
+        currentPage={currentPage}
+        onNavigate={handleNavigate}
+      />
 
-      {/* Show alert badge if active */}
-      {alerts.length > 0 && (
-        <button className="alert-badge" onClick={() => setShowAlerts(true)}>
-          ⚠️ {alerts.length} Alert{alerts.length > 1 ? 's' : ''}
-        </button>
-      )}
+      {/* Severe weather popup shows automatically - no badge needed */}
 
       <div className="main-content">
         <div className="left-section">
@@ -204,7 +267,10 @@ export default function App() {
       alerts={alerts}
       />
 
-      {showAlerts && <AlertPopup alerts={alerts} onClose={() => setShowAlerts(false)} />}
+      {/* Auto-show popup for severe weather alerts */}
+      {showAlerts && alerts.length > 0 && (
+        <AlertPopup alerts={alerts} onClose={() => setShowAlerts(false)} />
+      )}
 
       {/* Show geolocation error softly */}
       {geoError && <div className="geo-warning">📍 {geoError}</div>}

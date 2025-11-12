@@ -6,7 +6,7 @@ export default function AlertPopup({ alerts, onClose }) {
     <div className="alert-overlay" onClick={onClose}>
       <div className="alert-popup" onClick={(e) => e.stopPropagation()}>
         <div className="alert-header">
-          <h3>⚠️ Weather Alerts</h3>
+          <h3>🚨 Severe Weather Alert</h3>
           <button className="close-btn" onClick={onClose}>×</button>
         </div>
         <div className="alert-content">
