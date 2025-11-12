@@ -1,39 +1,343 @@
-.app-header {
+/* App Header */
+.app-header,
+.header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: linear-gradient(135deg, #0a2540, #193b64);
-  color: white;
-  padding: 1rem 2rem;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  color: #333;
+  padding: 25px 35px;
+  border-radius: 20px;
+  margin-bottom: 25px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
 }
 
-.app-title {
-  font-size: 1.8rem;
-  font-weight: bold;
+.app-header:hover,
+.header:hover {
+  box-shadow: 0 12px 40px rgba(102, 126, 234, 0.15);
+}
+
+/* App Title / Logo */
+.app-title,
+.logo {
+  font-size: 2.2rem;
+  font-weight: 800;
   letter-spacing: 1px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin: 0;
+  transition: all 0.3s ease;
 }
 
-.location-title {
+.app-title:hover,
+.logo:hover {
+  letter-spacing: 2px;
+}
+
+/* Location Section */
+.location-info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 5px;
+}
+
+.location-title,
+.city {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #333;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.location-icon {
   font-size: 1.1rem;
-  opacity: 0.85;
 }
 
+.date {
+  font-size: 0.9rem;
+  color: #888;
+  font-weight: 500;
+}
+
+/* Navigation Buttons */
 .nav-buttons {
   display: flex;
-  gap: 0.75rem;
+  gap: 12px;
+  align-items: center;
 }
 
 .nav-buttons button {
-  background: rgba(255, 255, 255, 0.1);
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
   border: none;
-  padding: 0.5rem 1rem;
-  border-radius: 0.5rem;
+  padding: 10px 20px;
+  border-radius: 12px;
   cursor: pointer;
-  transition: background 0.2s;
+  font-weight: 600;
+  font-size: 0.9rem;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .nav-buttons button:hover {
-  background: rgba(255, 255, 255, 0.2);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+}
+
+.nav-buttons button:active {
+  transform: translateY(0);
+}
+
+/* Secondary Button Style */
+.nav-buttons button.secondary {
+  background: rgba(102, 126, 234, 0.1);
+  color: #667eea;
+  box-shadow: none;
+}
+
+.nav-buttons button.secondary:hover {
+  background: rgba(102, 126, 234, 0.2);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
+}
+
+/* Icon Button Style */
+.nav-buttons button.icon-btn {
+  padding: 10px;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Search Bar in Header */
+.header-search {
+  display: flex;
+  align-items: center;
+  background: rgba(102, 126, 234, 0.1);
+  border-radius: 12px;
+  padding: 8px 16px;
+  gap: 10px;
+  transition: all 0.3s ease;
+}
+
+.header-search:focus-within {
+  background: rgba(102, 126, 234, 0.15);
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
+}
+
+.header-search input {
+  border: none;
+  background: transparent;
+  color: #333;
+  font-size: 0.95rem;
+  outline: none;
+  width: 200px;
+  padding: 0;
+}
+
+.header-search input::placeholder {
+  color: #888;
+}
+
+.header-search-icon {
+  color: #667eea;
+  font-size: 1.1rem;
+}
+
+/* Weather Status Badge */
+.weather-status-badge {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(102, 126, 234, 0.1);
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #667eea;
+}
+
+.weather-status-icon {
+  font-size: 1.2rem;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .app-header,
+  .header {
+    padding: 20px 25px;
+  }
+
+  .app-title,
+  .logo {
+    font-size: 1.8rem;
+  }
+
+  .nav-buttons {
+    gap: 10px;
+  }
+
+  .nav-buttons button {
+    padding: 8px 16px;
+    font-size: 0.85rem;
+  }
+
+  .header-search input {
+    width: 150px;
+  }
+}
+
+@media (max-width: 768px) {
+  .app-header,
+  .header {
+    flex-wrap: wrap;
+    padding: 18px 20px;
+    gap: 15px;
+  }
+
+  .app-title,
+  .logo {
+    font-size: 1.6rem;
+  }
+
+  .location-info {
+    order: 3;
+    width: 100%;
+    align-items: flex-start;
+    padding-top: 15px;
+    border-top: 1px solid rgba(0, 0, 0, 0.1);
+  }
+
+  .nav-buttons {
+    gap: 8px;
+  }
+
+  .nav-buttons button {
+    padding: 8px 14px;
+    font-size: 0.8rem;
+  }
+
+  .nav-buttons button.icon-btn {
+    width: 36px;
+    height: 36px;
+  }
+
+  .header-search {
+    width: 100%;
+    order: 4;
+  }
+
+  .header-search input {
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .app-header,
+  .header {
+    padding: 15px;
+  }
+
+  .app-title,
+  .logo {
+    font-size: 1.4rem;
+  }
+
+  .location-title,
+  .city {
+    font-size: 1rem;
+  }
+
+  .date {
+    font-size: 0.8rem;
+  }
+
+  .nav-buttons {
+    flex-wrap: wrap;
+  }
+
+  .nav-buttons button span {
+    display: none;
+  }
+
+  .nav-buttons button {
+    padding: 8px;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+  }
+}
+
+/* Dark Mode Support */
+@media (prefers-color-scheme: dark) {
+  .app-header,
+  .header {
+    background: rgba(30, 30, 30, 0.95);
+    color: #f9fafb;
+  }
+
+  .location-title,
+  .city {
+    color: #f9fafb;
+  }
+
+  .date {
+    color: #9ca3af;
+  }
+
+  .header-search {
+    background: rgba(102, 126, 234, 0.2);
+  }
+
+  .header-search input {
+    color: #f9fafb;
+  }
+
+  .header-search input::placeholder {
+    color: #9ca3af;
+  }
+}
+
+/* Accessibility - Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+  .app-header,
+  .header,
+  .app-title,
+  .logo,
+  .nav-buttons button {
+    transition: none !important;
+  }
+}
+
+/* Print Styles */
+@media print {
+  .nav-buttons {
+    display: none;
+  }
+
+  .app-header,
+  .header {
+    background: white;
+    box-shadow: none;
+    border-bottom: 2px solid #333;
+  }
+
+  .app-title,
+  .logo {
+    color: #333;
+    -webkit-text-fill-color: #333;
+  }
 }
